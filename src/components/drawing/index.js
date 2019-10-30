@@ -28,7 +28,6 @@ var subTypes = require('../../traces/scatter/subtypes');
 var makeBubbleSizeFn = require('../../traces/scatter/make_bubble_size_func');
 
 var drawing = module.exports = {};
-var appendArrayPointValue = require('../fx/helpers').appendArrayPointValue;
 
 // -----------------------------------------------------
 // styling functions for plot elements
@@ -702,9 +701,10 @@ drawing.textPointStyle = function(s, trace, gd) {
         }
 
         if(template) {
-            var pt = {};
-            appendArrayPointValue(pt, trace, d.i);
-            text = Lib.texttemplateString(text, {}, gd._fullLayout._d3locale, pt, d, trace._meta || {});
+            var labels = d._labels || {};
+            var pointValues = d._pointValues || {};
+            var meta = trace._meta || {};
+            text = Lib.texttemplateString(text, labels, gd._fullLayout._d3locale, pointValues, d, meta);
         }
 
         var pos = d.tp || trace.textposition;

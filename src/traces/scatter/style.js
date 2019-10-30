@@ -10,8 +10,12 @@
 'use strict';
 
 var d3 = require('d3');
-var Drawing = require('../../components/drawing');
+
 var Registry = require('../../registry');
+
+var Drawing = require('../../components/drawing');
+var Axes = require('../../plots/cartesian/axes');
+var appendArrayPointValue = require('../../components/fx/helpers').appendArrayPointValue;
 
 function style(gd) {
     var s = d3.select(gd).selectAll('g.trace.scatter');
@@ -46,7 +50,38 @@ function stylePoints(sel, trace, gd) {
 }
 
 function styleText(sel, trace, gd) {
-    Drawing.textPointStyle(sel.selectAll('text'), trace, gd);
+    var s = sel.selectAll('text');
+
+    if(trace.texttemplate) {
+        var xa = Axes.getFromTrace(gd, trace, 'x');
+        var ya = Axes.getFromTrace(gd, trace, 'y');
+
+        s.each(function(d) {
+            var pointValues = {};
+            appendArrayPointValue(pointValues, trace, d.i);
+
+            var labels = {};
+            if('x' in pointValues) labels.xLabel = Axes.tickText(xa, d.x, true).text;
+            if('y' in pointValues) labels.yLabel = Axes.tickText(ya, d.y, true).text;
+
+            // TODO
+            // - rLabel, thetaLabel for scatterpolar
+            // - yLabel for scattercarpet
+            // - aLabel, bLabel, cLabel for scatterternary
+            // - lonLabel, latLabel for scattergeo
+            //
+            // maybe we should define _{}Formatter functions on the full trace
+            // object so that we can reuse them for texttemplate, hover and
+            // hovertemplate formatting ??
+            //
+            // 2
+
+            d._pointValues = pointValues;
+            d._labels = labels;
+        });
+    }
+
+    Drawing.textPointStyle(s, trace, gd);
 }
 
 function styleOnSelect(gd, cd, sel) {
