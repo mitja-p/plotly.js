@@ -33,18 +33,19 @@ module.exports = function legendDefaults(layoutIn, layoutOut, fullData) {
         // *would* be shown by default, toward the two traces you need to
         // ensure the legend is shown by default, because this can still help
         // disambiguate.
-        if(trace.showlegend || trace._dfltShowLegend) {
+        if(trace.showlegend) {
             legendTraceCount++;
-            if(trace.showlegend) {
-                legendReallyHasATrace = true;
-                // Always show the legend by default if there's a pie,
-                // or if there's only one trace but it's explicitly shown
-                if(Registry.traceIs(trace, 'pie-like') ||
-                    trace._input.showlegend === true
-                ) {
-                    legendTraceCount++;
-                }
+
+            legendReallyHasATrace = true;
+            // Always show the legend by default if there's a pie,
+            // or if there's only one trace but it's explicitly shown
+            if(Registry.traceIs(trace, 'pie-like') ||
+                trace._input.showlegend === true
+            ) {
+                legendTraceCount++;
             }
+        } else if(trace._dfltShowLegend) { // i.e. *would* be shown by default
+            legendTraceCount++;
         }
 
         if((Registry.traceIs(trace, 'bar') && layoutOut.barmode === 'stack') ||
